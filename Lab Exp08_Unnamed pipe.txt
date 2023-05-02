@@ -1,0 +1,61 @@
+﻿In C programming, pipes are a mechanism for inter-process communication (IPC) that allow communication between two processes by creating a unidirectional channel between them. One process writes to the pipe, while the other process reads from it.
+There are two types of pipes: Named and unnamed pipe
+
+
+Named pipes (also known as FIFOs) and unnamed pipes are both methods of inter-process communication (IPC) in Unix-like operating systems. However, there are some key differences between them.
+
+
+An unnamed pipe, also called an anonymous pipe, is a one-way communication channel between two related processes, typically a parent process and a child process. It has no name or identifier, and can only be used for communication between the two processes that share it. Unnamed pipes are created using the pipe() system call, and are often used for simple communication between a producer and a consumer process.
+
+
+On the other hand, a named pipe is a named, two-way communication channel that can be used between any processes on the same system, regardless of their relationship. It has a name, typically a file name, that is used to identify the pipe in the file system. Named pipes are created using the mkfifo() system call, and are often used for more complex communication between processes, such as between different programs or different users.
+
+
+Program to establish Interprocess communication between Parent and child process using unnamed pipe.
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
+
+
+int main() {
+        int pipefd[2]; // file descriptors for the pipe
+        char buffer[25];
+        pid_t pid;
+
+
+        if (pipe(pipefd) == -1) { // create the pipe
+            printf("Pipe failed\n");
+            return 1;
+        }
+
+
+        pid = fork(); // create a child process
+
+
+        if (pid < 0) { // fork failed
+            printf("Fork failed\n");
+            return 1;
+        }
+
+
+        if (pid > 0) { // parent process
+            close(pipefd[0]); // close the read end of the pipe
+            printf("Parent process writing to pipe...\n");
+            write(pipefd[1], "Hello, child process!", 25);
+            close(pipefd[1]); // close the write end of the pipe
+        }
+        else { // child process
+            close(pipefd[1]); // close the write end of the pipe
+            printf("Child process reading from pipe...\n");
+            read(pipefd[0], buffer, 25);
+            printf("Child process received: %s\n", buffer);
+            close(pipefd[0]); // close the read end of the pipe
+        }
+
+
+        return 0;
+}

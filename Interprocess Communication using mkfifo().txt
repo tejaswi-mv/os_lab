@@ -1,0 +1,94 @@
+﻿Interprocess Communication using mkfifo()
+
+
+
+
+The mkfifo system call is used to create a special type of file in Unix and Unix-like operating systems called a named pipe, or FIFO (first in, first out). A named pipe is a type of inter-process communication (IPC) mechanism that allows two or more processes to communicate with each other by reading and writing to a common "file".
+
+
+The mkfifo system call takes a path name as an argument and creates a new named pipe with that name.
+
+
+int mkfifo(const char *pathname, mode_t mode);
+
+
+The pathname argument specifies the name of the named pipe to be created. The mode argument specifies the file permissions of the named pipe.
+
+
+
+
+Exercise 1
+Write a C program that creates a named pipe (FIFO) using the mkfifo system call. Then, fork a child process. In the parent process, write some data to the pipe using the write system call. In the child process, read the data from the pipe using the read system call.
+
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+
+
+
+
+
+int main()
+{
+        char buf[20];
+        int pid, fd1, fd2;
+        // Create the named pipe
+        if (mkfifo(pipe_name, 0666) == -1) {
+            printf("mkfifo failed\n");
+            exit(1);
+        }
+
+
+        // Fork the child process
+        pid = fork();
+        if (pid == -1) {
+            printf("fork failed\n");
+            exit(1);
+        }
+
+
+        if (pid == 0) { // Child process
+            // Open the named pipe for reading
+            fd1 = open(pipe_name, O_RDONLY);
+            if (fd1 == -1) {
+                printf("open failed\n");
+                exit(1);
+            }
+
+
+            // Read from the named pipe and print to standard output
+            while (read(fd1, buf, 20) > 0) {
+                write(1, buf, 20);
+            }
+
+
+            // Close the named pipe and exit
+            close(fd1);
+            exit(0);
+        } else { // Parent process
+            // Open the named pipe for writing
+            fd2 = open(pipe_name, O_WRONLY);
+            if (fd2 == -1) {
+                printf("open failed\n");
+                exit(1);
+            }
+
+
+            // Write some data to the named pipe
+            write(fd, "Hello, world!\n", 20);
+
+
+            // Close the named pipe and exit
+            close(fd2);
+            exit(1);
+        }
+
+
+        return 0;
+}

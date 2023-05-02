@@ -1,0 +1,94 @@
+﻿CSE325 Lab Experiment 07:: Process Synchronization using Semaphores/Mutex
+
+
+
+
+pthread_mutex_t is a type of variable in the POSIX threads (pthreads) library that represents a mutex (short for mutual exclusion). A mutex is a synchronization primitive that is used to protect shared resources such as variables, data structures, or code sections from concurrent access by multiple threads.
+
+
+A pthread_mutex_t variable is typically used to guard access to a shared resource. When a thread wants to access the resource, it must first acquire the mutex using the pthread_mutex_lock() function. This function will block the thread if the mutex is already held by another thread. Once the thread has acquired the mutex, it can safely access the shared resource. When the thread is done with the resource, it should release the mutex using the pthread_mutex_unlock() function, allowing other threads to acquire it.
+
+
+The pthread_mutex_t type is defined in the pthread.h header file, and it can be initialized using the pthread_mutex_init() function.
+
+
+The pthread_mutex_init() function takes two arguments: a pointer to a pthread_mutex_t variable that will store the initialized mutex, and a pointer to a pthread_mutexattr_t variable that specifies the attributes of the mutex. If you pass NULL as the second argument, the mutex is initialized with the default attributes.
+
+
+The pthread_mutex_init() function in the POSIX threads (pthreads) library returns an integer value to indicate whether the mutex initialization was successful or not.
+
+
+If the mutex is successfully initialized, pthread_mutex_init() returns 0. If an error occurs during initialization, the function returns a non-zero error code that indicates the cause of the error.
+
+
+
+
+The pthread_mutex_init() function takes two arguments: a pointer to a pthread_mutex_t variable that will store the initialized mutex, and a pointer to a pthread_mutexattr_t variable that specifies the attributes of the mutex. If you pass NULL as the second argument, the mutex is initialized with the default attributes.
+
+
+The pthread_mutex_init() function in the POSIX threads (pthreads) library returns an integer value to indicate whether the mutex initialization was successful or not.
+
+
+If the mutex is successfully initialized, pthread_mutex_init() returns 0. If an error occurs during initialization, the function returns a non-zero error code that indicates the cause of the error.
+
+
+The pthread_mutex_lock() function takes a pointer to a pthread_mutex_t variable that represents the mutex to be locked. If the mutex is currently unlocked, the function locks the mutex and returns 0. If the mutex is already locked by another thread, the calling thread will block until the mutex becomes available.
+
+
+The pthread_mutex_unlock() function takes a pointer to a pthread_mutex_t variable that represents the mutex to be unlocked. If the mutex was locked by the calling thread, the function releases the lock and returns 0. If the mutex was not locked by the calling thread or an error occurs, the behavior is undefined.
+
+
+The pthread_mutex_destroy() function takes a pointer to a pthread_mutex_t variable that represents the mutex to be destroyed. The function destroys the mutex object and releases any associated system resources. After a mutex has been destroyed, it can no longer be used for synchronization.
+
+
+
+
+
+
+
+
+Sample Program:
+
+
+#include <stdio.h>
+#include <pthread.h>
+
+
+pthread_mutex_t mutex; // Declare a global mutex variable
+
+
+int main() {
+        // Initialize the mutex
+        if (pthread_mutex_init(&mutex, NULL) != 0) {
+            printf("Mutex initialization failed.\n");
+            return 1;
+        }
+
+
+        // Lock the mutex
+        if (pthread_mutex_lock(&mutex) != 0) {
+            printf("Mutex locking failed.\n");
+            return 1;
+        }
+
+
+        // Critical section
+        printf("Inside critical section.\n");
+
+
+        // Unlock the mutex
+        if (pthread_mutex_unlock(&mutex) != 0) {
+            printf("Mutex unlocking failed.\n");
+            return 1;
+        }
+
+
+        // Destroy the mutex
+        if (pthread_mutex_destroy(&mutex) != 0) {
+            printf("Mutex destruction failed.\n");
+            return 1;
+        }
+
+
+        return 0;
+}
